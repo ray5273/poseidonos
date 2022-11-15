@@ -319,7 +319,7 @@ SegmentCtx::_RebuildSegmentList(void)
     {
         SegmentState state = segmentInfos[segId].GetState();
         segmentList[state]->AddToList(segId);
-        POS_TRACE_INFO(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),
+        POS_TRACE_DEBUG(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),
             "segment_id:{}, state:{}", segId, state);
     }
 }
