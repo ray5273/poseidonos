@@ -448,7 +448,6 @@ MetaFsFileControlApi::_AddFileContext(std::string& fileName,
         nameMapByfd.insert({make_pair(type, fd), fileName});
         idxMapByName.insert({make_pair(type, fileName), index});
     }
-
     // update
     MetaFileContext* context = &cxtList[index];
     context->Reset();

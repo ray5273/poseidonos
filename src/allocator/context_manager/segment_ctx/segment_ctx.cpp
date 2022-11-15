@@ -314,7 +314,7 @@ SegmentCtx::_RebuildSegmentList(void)
     {
         segmentList[state]->Reset();
     }
-    POS_TRACE_INFO(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),"num user area segments : {}", addrInfo->GetnumUserAreaSegments());
+    POS_TRACE_DEBUG(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),"num user area segments : {}", addrInfo->GetnumUserAreaSegments());
     for (uint32_t segId = 0; segId < addrInfo->GetnumUserAreaSegments(); ++segId)
     {
         SegmentState state = segmentInfos[segId].GetState();
