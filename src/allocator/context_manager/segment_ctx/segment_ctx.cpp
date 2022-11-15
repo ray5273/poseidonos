@@ -300,7 +300,7 @@ SegmentCtx::GetOccupiedStripeCount(SegmentId segId)
 void
 SegmentCtx::AfterLoad(char* buf)
 {
-    POS_TRACE_DEBUG(EID(ALLOCATOR_FILE_LOAD_ERROR), "SegmentCtx file loaded:{}", ctxHeader.ctxVersion);
+    POS_TRACE_INFO(EID(ALLOCATOR_FILE_LOAD_ERROR), "SegmentCtx file loaded:{}", ctxHeader.ctxVersion);
     ctxStoredVersion = ctxHeader.ctxVersion;
     ctxDirtyVersion = ctxHeader.ctxVersion + 1;
 
@@ -314,12 +314,12 @@ SegmentCtx::_RebuildSegmentList(void)
     {
         segmentList[state]->Reset();
     }
-
+    POS_TRACE_INFO(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),"num user area segments : {}", addrInfo->GetnumUserAreaSegments());
     for (uint32_t segId = 0; segId < addrInfo->GetnumUserAreaSegments(); ++segId)
     {
         SegmentState state = segmentInfos[segId].GetState();
         segmentList[state]->AddToList(segId);
-        POS_TRACE_DEBUG(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),
+        POS_TRACE_INFO(EID(ALLOCATOR_SEGMENT_ADDED_TO_LIST),
             "segment_id:{}, state:{}", segId, state);
     }
 }
