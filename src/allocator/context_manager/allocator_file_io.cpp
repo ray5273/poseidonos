@@ -41,6 +41,7 @@
 #include "src/metafs/include/metafs_service.h"
 #include "src/metafs/config/metafs_config_manager.h"
 #include "src/meta_file_intf/rocksdb_metafs_intf.h"
+#include "src/allocator/context_manager/segment_ctx/segment_info.h"
 
 namespace pos
 {
@@ -90,14 +91,19 @@ AllocatorFileIo::_UpdateSectionInfo(void)
     for (int sectionId = 0; sectionId < client->GetNumSections(); sectionId++)
     {
         int size = client->GetSectionSize(sectionId);
-
+        // TODO : 여기의 section addr은 바이너리마다 새로 생성하는 곳일거라는 생각이든다.
         ContextSection section(client->GetSectionAddr(sectionId), size, currentOffset);
         sections.push_back(section);
+        //POS_TRACE_INFO(EID(ALLOCATOR_FILE_IO_INITIALIZED),
+        //"Update Section client : {} , addr : {} , size : {} ", client->GetFilename(),(void*)client->GetSectionAddr(sectionId), size);
 
         currentOffset += size;
     }
 
     fileSize = currentOffset;
+
+    POS_TRACE_INFO(EID(ALLOCATOR_FILE_IO_INITIALIZED),
+        "Allocator File Io , number of Sections : {} ", sections.size());
 }
 
 void
@@ -127,7 +133,24 @@ AllocatorFileIo::_LoadSectionData(char* buf)
     {
         if (sections[sectionId].addr != nullptr)
         {
+            char vtableBuf[4]="";
+            if(client->GetFilename().compare("SegmentContext")==0 && sectionId == 1){
+                memcpy(vtableBuf,sections[sectionId].addr,4);
+            //    POS_TRACE_INFO(EID(ALLOCATOR_FILE_IO_INITIALIZED),
+            //    "SegmentCtx vptr value : {}",vtableBuf);
+            }
             memcpy(sections[sectionId].addr, (buf + sections[sectionId].offset), sections[sectionId].size);
+            //POS_TRACE_INFO(EID(ALLOCATOR_FILE_IO_INITIALIZED),
+            //    "Load Section client : {} addr : {}, offset : {} , size : {}", client->GetFilename(),(void*)sections[sectionId].addr, sections[sectionId].offset, sections[sectionId].size);
+
+            if(client->GetFilename().compare("SegmentContext")==0 && sectionId == 1){
+                int segmentInfoSize = sizeof(SegmentInfo);
+                for(uint32_t i=0;i<addrInfo->GetnumUserAreaSegments();i++){
+                    memcpy(sections[sectionId].addr+i*segmentInfoSize,vtableBuf,4);
+                }
+             //   POS_TRACE_INFO(EID(ALLOCATOR_FILE_IO_INITIALIZED),
+             //   "SegmentCtx Copy Vptr finished");
+            }
         }
     }
 }
@@ -194,6 +217,7 @@ AllocatorFileIo::_Load(char* buf)
         numFilesReading++;
 
         MetaIoCbPtr callback = std::bind(&AllocatorFileIo::_LoadCompletedThenCB, this, std::placeholders::_1);
+        // 여기 버퍼에 원하는 값이 있어야한다.
         AllocatorIoCtx* request = new AllocatorIoCtx(MetaFsIoOpcode::Read,
             file->GetFd(), 0, fileSize, buf, callback);
         int ret = file->AsyncIO(request);
@@ -305,6 +329,8 @@ AllocatorFileIo::_PrepareBuffer(char* buf)
     {
         std::lock_guard<std::mutex> lock(client->GetCtxLock());
         _CopySectionData(buf, 0, client->GetNumSections());
+        POS_TRACE_INFO(EID(ALLOCATOR_META_ARCHIVE_STORE_COMPLETED),
+        "allocator file added section number : {} ", client->GetNumSections());
     }
 }
 
