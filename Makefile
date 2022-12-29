@@ -149,7 +149,7 @@ LDFLAGS += -lyaml-cpp
 LDFLAGS += -ltbb
 LDFLAGS += -lrocksdb
 LDFLAGS += -lstdc++fs
-LDFLAGS += -lisal
+#LDFLAGS += -lisal
 
 ifeq ($(CONFIG_ASAN), y)
 CPPFLAGS += -fno-omit-frame-pointer -fsanitize=address

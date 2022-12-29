@@ -99,23 +99,23 @@ else()
 endif()
 
 # Build DPDK conditionally
-ExternalProject_Add(dpdk
-    GIT_REPOSITORY ${REPO_DPDK}
-    GIT_TAG "v20.08"
-    SOURCE_DIR ${PROJ_ROOT}/lib/${POS_DEP_DPDK}
-    BUILD_IN_SOURCE 1
-    LOG_DOWNLOAD ON
-    LOG_UPDATE ON
-    LOG_PATCH ON
-    LOG_CONFIGURE ON
-    LOG_BUILD ON
-    LOG_INSTALL ON
-    LOG_OUTPUT_ON_FAILURE ON
-    LOG_MERGED_STDOUTERR ON
-    PATCH_COMMAND patch -t -p0 -i ${PROJ_ROOT}/lib/dpdk-20.08.patch
-    CONFIGURE_COMMAND "" 
-    BUILD_COMMAND make install MAKE_PAUSE=n T=${TARGET} EXTRA_CFLAGS=${EXTRA_CFLAGS} DESTDIR=. -j 4
-    INSTALL_COMMAND "")
+#ExternalProject_Add(dpdk
+#    GIT_REPOSITORY ${REPO_DPDK}
+#    GIT_TAG "v20.08"
+#    SOURCE_DIR ${PROJ_ROOT}/lib/${POS_DEP_DPDK}
+#    BUILD_IN_SOURCE 1
+#    LOG_DOWNLOAD ON
+#    LOG_UPDATE ON
+#    LOG_PATCH ON
+#    LOG_CONFIGURE ON
+#    LOG_BUILD ON
+#    LOG_INSTALL ON
+#    LOG_OUTPUT_ON_FAILURE ON
+#    LOG_MERGED_STDOUTERR ON
+#    PATCH_COMMAND patch -t -p0 -i ${PROJ_ROOT}/lib/dpdk-20.08.patch
+#    CONFIGURE_COMMAND "" 
+#    BUILD_COMMAND make install MAKE_PAUSE=n T=${TARGET} EXTRA_CFLAGS=${EXTRA_CFLAGS} DESTDIR=. -j 4
+#    INSTALL_COMMAND "")
 
 # Set FIO build options
 set(POS_DEP_FIO "fio")
@@ -170,7 +170,7 @@ endif()
 
 # Build SPDK conditionally
 ExternalProject_Add(spdk
-    DEPENDS dpdk fio air
+    DEPENDS fio air
     GIT_REPOSITORY ${REPO_SPDK}
     GIT_TAG "v22.01.1"
     SOURCE_DIR ${PROJ_ROOT}/lib/${POS_DEP_SPDK}
@@ -185,7 +185,7 @@ ExternalProject_Add(spdk
     LOG_OUTPUT_ON_FAILURE ON
     LOG_MERGED_STDOUTERR ON
     PATCH_COMMAND patch -t -p0 -i ${PROJ_ROOT}/lib/spdk-22.01.1.patch
-    CONFIGURE_COMMAND ./configure --with-dpdk=${PROJ_ROOT}/lib/${POS_DEP_DPDK} --with-rdma --with-fio=${PROJ_ROOT}/lib/${POS_DEP_FIO} --with-pos --without-isal --without-vhost ${ENABLE_DEBUG} ${SPDK_ASAN_OPT}
+    CONFIGURE_COMMAND ./configure --with-dpdk=/usr/local/lib/aarch64-linux-gnu/ --with-rdma --with-fio=${PROJ_ROOT}/lib/${POS_DEP_FIO} --with-pos --without-isal --without-vhost ${ENABLE_DEBUG} ${SPDK_ASAN_OPT}
     BUILD_COMMAND ./scripts/pkgdep.sh
     COMMAND make -j ${NUM_BUILD_CORE}
     INSTALL_COMMAND cp ${PROJ_ROOT}/lib/${POS_DEP_SPDK}/build/fio/spdk_nvme ${PROJ_ROOT}/lib/${POS_DEP_SPDK}/examples/nvme/fio_plugin/fio_plugin)

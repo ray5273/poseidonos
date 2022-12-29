@@ -6,7 +6,7 @@ INTERNAL=FALSE
 
 GO_VERSION="go1.18.3"
 
-ARCHIVE_FILE=${GO_VERSION}.linux-amd64.tar.gz
+ARCHIVE_FILE=${GO_VERSION}.linux-arm64.tar.gz
 INSTALL_PATH=/usr/local
 
 DEFAULT_URL="https://golang.org/dl/${ARCHIVE_FILE}"
